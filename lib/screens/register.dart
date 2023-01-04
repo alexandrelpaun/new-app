@@ -1,4 +1,5 @@
 import 'package:auto_sales_flutter/cars/anunturi_masini.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:email_validator/email_validator.dart';
 import 'package:auto_sales_flutter/screens/login.dart';
@@ -21,6 +22,14 @@ class _RegisterState extends State<Register> {
   final _auth = FirebaseAuth.instance;
 
   @override
+  void initState() {
+    super.initState();
+    Firebase.initializeApp(); 
+    }
+
+
+
+  @override
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
@@ -33,8 +42,10 @@ class _RegisterState extends State<Register> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Form(
+        
         key: _formKey,
         child: ListView(
+          
           padding: EdgeInsets.all(30.0),
           children: <Widget>[
             TextFormField(
@@ -108,9 +119,13 @@ class _RegisterState extends State<Register> {
                     print(
                         '${emailController.text} - ${passwordController.text} - ${confPasswordController.text}');
 
+
+                        
+
                     final newUser = await _auth.createUserWithEmailAndPassword(
                         email: emailController.text,
                         password: passwordController.text);
+
                     if (newUser != null) {
                       Navigator.pushAndRemoveUntil(
                           context,
@@ -132,4 +147,21 @@ class _RegisterState extends State<Register> {
       ),
     );
   }
+
+
+FutureBuilder<ModelFormular> buildFutureBuilder() {
+    return FutureBuilder<ModelFormular>(
+      future: Firebase.initializeApp(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return Text(snapshot.data!.nume!);
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+
+        return const CircularProgressIndicator();
+      },
+    );
+  }
+
 }
